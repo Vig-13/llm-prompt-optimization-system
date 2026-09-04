@@ -4,7 +4,7 @@
 
 ### Automatically generate, evaluate, compare, and select better prompts.
 
-A modular Python system that uses an LLM to analyze a task, generate multiple prompt candidates, test them against the same evaluation scenarios, score their effectiveness, track token usage, and select the strongest prompt.
+A modular Python system that uses an LLM to analyze a task, generate multiple prompt candidates, test them against the same evaluation scenarios, evaluate their outputs and prompt effectiveness, track token usage, and select the strongest prompt.
 
 <br>
 
@@ -34,9 +34,13 @@ Instead of manually deciding whether a prompt is better, the system automaticall
 5. Evaluates the generated outputs
 6. Evaluates prompt effectiveness
 7. Tracks token usage
-8. Selects the most effective prompt
+8. Selects the strongest prompt
 
-### 🔄 System Workflow
+The result is a measurable workflow for comparing prompt-engineering strategies.
+
+---
+
+## 🔄 System Workflow
 
 ```text
                          USER PROMPT
@@ -90,18 +94,24 @@ Instead of manually deciding whether a prompt is better, the system automaticall
                     ┌───────────────┐
                     │ 🏆 BEST PROMPT│
                     └───────────────┘
+```
 
-🔍 1. Automatic Task Analysis
+---
 
-The original user prompt is analyzed into structured information:
+# ✨ Key Features
 
-Task type
-Task summary
-Expected output
-Evaluation focus
+## 🔍 1. Automatic Task Analysis
+
+The original user prompt is first analyzed into structured information:
+
+- **Task Type**
+- **Task Summary**
+- **Expected Output**
+- **Evaluation Focus**
 
 Example:
 
+```json
 {
   "task_type": "email writing",
   "task_summary": "Write a professional email to a client explaining that a project has been delayed.",
@@ -114,116 +124,172 @@ Example:
     "actionability"
   ]
 }
-🧪 2. Multi-Strategy Prompt Optimization
+```
 
-The system generates three different prompt candidates, each using a different optimization strategy.
+This structured task representation is then used by the downstream evaluation stages.
 
-Candidate	Optimization Strategy
-🎯 Candidate 1	Clarity-focused
-🧩 Candidate 2	Structure-focused
-📋 Candidate 3	Constraint-focused
+---
 
-This allows the system to compare different prompt-engineering approaches instead of generating three nearly identical prompts.
+## 🧪 2. Multi-Strategy Prompt Optimization
 
-🎭 3. Scenario-Based Evaluation
+The system generates **three different prompt candidates**, each using a distinct optimization strategy.
 
-The system generates exactly two neutral evaluation scenarios from the original task and its task analysis.
+| Candidate | Optimization Strategy |
+|-----------|-----------------------|
+| 🎯 Candidate 1 | Clarity-focused |
+| 🧩 Candidate 2 | Structure-focused |
+| 📋 Candidate 3 | Constraint-focused |
 
-The scenarios are created independently of the optimized prompt candidates.
+### Candidate 1 — Clarity-focused
 
-Every prompt is then tested against the same scenarios.
+Improves clarity and removes ambiguity while preserving the original intent.
 
-                   SAME TEST SCENARIOS
-                          │
-          ┌───────────────┼───────────────┐
-          ▼               ▼               ▼
-       Baseline       Candidate 1     Candidate 2
-          │               │               │
-          └───────────────┼───────────────┘
-                          │
-                          ▼
-                     Candidate 3
+### Candidate 2 — Structure-focused
 
-This provides a more controlled comparison between prompts.
+Improves organization, output structure, and explicit instructions.
 
-⚖️ 4. LLM-as-a-Judge Evaluation
+### Candidate 3 — Constraint-focused
 
-The system evaluates both the generated outputs and the prompt instructions themselves.
+Adds explicit requirements, constraints, and instruction-following guidance.
 
-Output Quality
+The system therefore compares different prompt-engineering approaches instead of simply generating three similar rewrites.
+
+---
+
+## 🎭 3. Scenario-Based Evaluation
+
+The system generates exactly **2 neutral evaluation scenarios** from the original task and its task analysis.
+
+The scenarios are generated independently of the optimized prompt candidates.
+
+Every prompt is then evaluated against the **same scenarios**.
+
+```text
+                    SAME TEST SCENARIOS
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+          ▼                 ▼                 ▼
+      Baseline          Candidate 1      Candidate 2
+          │                 │                 │
+          └─────────────────┼─────────────────┘
+                            │
+                            ▼
+                       Candidate 3
+```
+
+Using identical scenarios provides a more controlled comparison between prompts.
+
+---
+
+## ⚖️ 4. LLM-as-a-Judge Evaluation
+
+The system evaluates two separate dimensions:
+
+### Output Quality
 
 Generated outputs are evaluated using:
 
-Task Completion
-Requirement Satisfaction
-Scenario Appropriateness
-Expected Output Alignment
-Prompt Effectiveness
+- Task Completion
+- Requirement Satisfaction
+- Scenario Appropriateness
+- Expected Output Alignment
 
-Prompts are evaluated using:
+### Prompt Effectiveness
 
-Task Clarity
-Requirement Coverage
-Output Specification
-Constraint Handling
-Ambiguity Reduction
+The prompts themselves are evaluated using:
 
-Scores are normalized between:
+- Task Clarity
+- Requirement Coverage
+- Output Specification
+- Constraint Handling
+- Ambiguity Reduction
 
-0.0 ─────────────────────── 1.0
-Poor                         Excellent
-📊 5. Quantitative Prompt Comparison
+The individual criteria are scored and aggregated into normalized scores.
+
+```text
+0.0 ─────────────────────────────── 1.0
+Poor                              Excellent
+```
+
+> **Note:** The evaluation scores are LLM-generated assessments and should be interpreted as experiment-specific measurements rather than absolute measures of prompt quality.
+
+---
+
+## 📊 5. Quantitative Prompt Comparison
 
 For every prompt, the system calculates:
 
-Average Output Quality
-Average Prompt Effectiveness
-Average Overall Score
-Minimum Output Quality
-Average Input Tokens
-Average Output Tokens
-Average Total Tokens
+- Average Output Quality
+- Average Prompt Effectiveness
+- Average Overall Score
+- Minimum Output Quality
+- Average Input Tokens
+- Average Output Tokens
+- Average Total Tokens
 
-This transforms prompt optimization from a purely subjective process into a measurable experiment.
+This turns prompt optimization from a purely subjective process into a measurable experiment.
 
-🏆 6. Automatic Best-Prompt Selection
+---
+
+## 🏆 6. Automatic Best-Prompt Selection
 
 The system automatically selects the strongest prompt using the following priority:
 
-1. Highest Average Output Quality
-2. Highest Minimum Output Quality
-   → Measures consistency across scenarios
-3. Highest Prompt Effectiveness
-4. Lowest Token Usage
+1. **Highest Average Output Quality**
+2. **Highest Minimum Output Quality**
+   - Measures consistency across evaluation scenarios
+3. **Highest Average Prompt Effectiveness**
+4. **Lowest Average Token Usage**
 
-The selected prompt is returned along with the selection reasoning.
+The selected prompt is returned along with the reasoning behind the selection.
 
-🔢 7. Token Usage Analysis
+---
+
+## 🔢 7. Token Usage Analysis
 
 Every prompt execution tracks:
 
-Input Tokens
-Output Tokens
-Total Tokens
+- Input Tokens
+- Output Tokens
+- Total Tokens
 
-This makes it possible to analyze the trade-off between prompt quality and token usage.
+This allows the system to analyze the trade-off between prompt quality and token efficiency.
 
-🖥️ Example
-Original Prompt
-Write an email to a client about
-a project delay.
+A longer prompt does not automatically mean a better prompt.
 
-The system generates multiple optimized alternatives.
+---
 
-🎯 Candidate 1 — Clarity-focused
-Write a professional and polite email to a client
-explaining that their project is delayed. Include
-placeholders for the project name, the reason for
-the delay, the new expected completion date, and
-proposed next steps.
-🧩 Candidate 2 — Structure-focused
-Draft a client project delay email using the
-following structure:
+# 🖥️ Example Experiment
+
+## Original Prompt
+
+```text
+Write an email to a client about a project delay.
+```
+
+The system analyzes the task and generates three optimized alternatives.
+
+---
+
+### 🎯 Candidate 1 — Clarity-focused
+
+```text
+Write a professional and polite email to a client explaining that their project is delayed.
+
+Include placeholders for:
+- Project name
+- Reason for the delay
+- New expected completion date
+- Proposed next steps
+```
+
+---
+
+### 🧩 Candidate 2 — Structure-focused
+
+```text
+Draft a client project delay email using the following structure:
 
 1. Clear subject line indicating a project update.
 2. Friendly opening and direct statement of the delay.
@@ -232,80 +298,129 @@ following structure:
 5. Reassurance and next steps.
 
 Keep the tone empathetic, accountable, and proactive.
-📋 Candidate 3 — Constraint-focused
-Write an email to a client notifying them of
-a project delay.
+```
+
+---
+
+### 📋 Candidate 3 — Constraint-focused
+
+```text
+Write an email to a client notifying them of a project delay.
 
 Constraints:
+
 - Maintain a professional and reassuring tone.
-- Do not make excuses.
+- Do not make excuses; state the reason objectively.
 - Clearly outline the revised timeline.
 - Keep the word count under 150 words.
 - Use placeholders where necessary.
+```
 
-The four prompts are then executed against the same evaluation scenarios.
+The baseline and all three candidates are then executed against the same evaluation scenarios.
 
-📈 Example Evaluation Result
+---
+
+# 📈 Example Evaluation Result
 
 One experiment produced the following results:
 
-Prompt	Output Quality	Prompt Effectiveness	Overall Score	Avg. Total Tokens
-Baseline	1.000	0.180	0.754	373.5
-Candidate 1	1.000	0.760	0.928	390.5
-Candidate 2	1.000	0.950	0.985	439.0
-Candidate 3	0.988	0.810	0.934	349.5
-🏆 Selected Prompt
+| Prompt | Output Quality | Prompt Effectiveness | Overall Score | Avg. Total Tokens |
+|--------|---------------:|---------------------:|--------------:|------------------:|
+| Baseline | 1.000 | 0.180 | 0.754 | 373.5 |
+| Candidate 1 | 1.000 | 0.760 | 0.928 | 390.5 |
+| Candidate 2 | 1.000 | 0.950 | 0.985 | 439.0 |
+| Candidate 3 | 0.988 | 0.810 | 0.934 | 349.5 |
 
-Candidate 2
+### 🏆 Selected Prompt
 
+**Candidate 2**
+
+```text
 Draft a client project delay email using the following structure:
+
 1. Clear subject line indicating a project update.
 2. Friendly opening and direct statement of the delay.
 3. Brief, professional explanation of the cause.
 4. Revised timeline with the new delivery date.
 5. Reassurance and next steps.
+
 Keep the tone empathetic, accountable, and proactive.
+```
 
-The candidate achieved the highest prompt-effectiveness score while maintaining excellent output quality and consistency across the evaluation scenarios.
+Candidate 2 achieved the highest overall score, primarily because of its strong prompt-effectiveness score while maintaining excellent output quality across the evaluation scenarios.
 
-Note: Evaluation scores are LLM-generated assessments and should be interpreted as experiment-specific rather than absolute measures of prompt quality.
+> **Important:** These results are from a single experiment. LLM-based evaluation can vary between runs, so the scores should be treated as experimental measurements rather than universal benchmarks.
 
-🏗️ Architecture
+---
 
-Pipeline
-User Prompt
-     │
-     ▼
-Task Analysis
-     │
-     ├───────────────┐
-     ▼               ▼
-Prompt Candidates   Evaluation Scenarios
-     │               │
-     └───────┬───────┘
-             ▼
-      Prompt Execution
-             │
-             ▼
-      Generated Outputs
-             │
-             ▼
-        LLM-as-a-Judge
-         /          \
-        ▼            ▼
-Output Quality   Prompt Effectiveness
-        \            /
-         ▼          ▼
-          Aggregation
-               │
-               ▼
-          Best Prompt
-📸 Example Execution
+# 🏗️ Architecture
 
-The system can be executed directly from the command line and produces structured evaluation results.
+```text
+                    ┌───────────────┐
+                    │  User Prompt  │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │ Task Analysis │
+                    └───────┬───────┘
+                            │
+              ┌─────────────┴─────────────┐
+              │                           │
+              ▼                           ▼
+     ┌─────────────────┐        ┌────────────────────┐
+     │ Prompt          │        │ Evaluation         │
+     │ Candidates      │        │ Scenarios          │
+     │                 │        │                    │
+     │ Candidate 1     │        │ Scenario 1         │
+     │ Candidate 2     │        │ Scenario 2         │
+     │ Candidate 3     │        │                    │
+     └────────┬────────┘        └─────────┬──────────┘
+              │                           │
+              └─────────────┬─────────────┘
+                            │
+                            ▼
+                  ┌─────────────────────┐
+                  │ Prompt Execution    │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Generated Outputs   │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │   LLM-as-a-Judge    │
+                  │                     │
+                  │ Output Quality      │
+                  │ Prompt Effectiveness│
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Metric Aggregation  │
+                  │                     │
+                  │ Quality             │
+                  │ Effectiveness       │
+                  │ Token Usage         │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                    ┌────────────────┐
+                    │  Best Prompt   │
+                    └────────────────┘
+```
 
-Example:
+---
 
+# 📸 Example Execution Output
+
+The complete evaluation pipeline can be executed directly from the command line.
+
+Example output:
+
+```text
 ======================================================================
 PROMPT EVALUATION RESULTS
 ======================================================================
@@ -339,24 +454,37 @@ BEST PROMPT
 ======================================================================
 
 Candidate 2
-🧮 Scoring Methodology
+```
+
+---
+
+# 🧮 Scoring Methodology
 
 The system calculates the overall score using:
 
+```text
 Overall Score =
     70% × Output Quality
   + 30% × Prompt Effectiveness
-Why 70/30?
+```
+
+### Why 70/30?
 
 The primary objective is to produce a better result for the user's task.
 
 Therefore:
 
+```text
 Task Performance > Prompt Design
+```
 
-Prompt effectiveness is still included because a prompt that consistently communicates requirements better is generally more useful for future executions.
+Prompt effectiveness is still included because a prompt that communicates requirements more clearly and explicitly can provide better performance across future executions.
 
-📁 Project Structure
+---
+
+# 📁 Project Structure
+
+```text
 llm-prompt-optimization-system/
 │
 ├── app/
@@ -382,193 +510,308 @@ llm-prompt-optimization-system/
 │   ├── test_scenario_generator.py
 │   └── test_task_analyzer.py
 │
-├── assets/
-│   ├── architecture.png
-│   └── evaluation-output.png
-│
 ├── README.md
 ├── requirements.txt
 └── .gitignore
-🛠️ Tech Stack
-Technology	Purpose
-🐍 Python	Core application and evaluation pipeline
-🤖 Google Gemini API	LLM generation and evaluation
-🧠 Prompt Engineering	Prompt optimization strategies
-⚖️ LLM-as-a-Judge	Automated evaluation
-📦 JSON	Structured LLM responses
-🧩 Python Modules	Modular application architecture
-⚙️ Installation
-1. Clone the repository
+```
+
+---
+
+# 🛠️ Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| 🐍 Python | Core application and evaluation pipeline |
+| 🤖 Google Gemini API | LLM generation and evaluation |
+| 🧠 Prompt Engineering | Prompt optimization strategies |
+| ⚖️ LLM-as-a-Judge | Automated evaluation |
+| 📦 JSON | Structured LLM responses |
+| 🧩 Python Modules | Modular application architecture |
+
+---
+
+# ⚙️ Installation
+
+## 1. Clone the Repository
+
+```bash
 git clone https://github.com/Vig-13/llm-prompt-optimization-system.git
-
 cd llm-prompt-optimization-system
-2. Create a virtual environment
-Windows
+```
+
+## 2. Create a Virtual Environment
+
+### Windows
+
+```bash
 python -m venv venv
-
 venv\Scripts\activate
-macOS / Linux
+```
+
+### macOS / Linux
+
+```bash
 python3 -m venv venv
-
 source venv/bin/activate
-3. Install dependencies
+```
+
+## 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-4. Configure the Gemini API key
+```
 
-Create a .env file in the project root:
+## 4. Configure the Gemini API Key
 
+Create a `.env` file in the project root:
+
+```env
 GEMINI_API_KEY=your_api_key_here
+```
 
-The .env file is excluded from Git using .gitignore.
+The `.env` file is excluded from Git using `.gitignore`.
 
-▶️ Running the Project
+---
+
+# ▶️ Running the Project
 
 Run the complete evaluation pipeline from the project root:
 
+```bash
 python -m experiments.test_evaluator
-Individual Components
+```
 
-Task analysis:
+## Individual Components
 
+### Task Analysis
+
+```bash
 python -m experiments.test_task_analyzer
+```
 
-Candidate generation:
+### Candidate Generation
 
+```bash
 python -m experiments.test_candidate_generator
+```
 
-Scenario generation:
+### Scenario Generation
 
+```bash
 python -m experiments.test_scenario_generator
+```
 
-Prompt execution:
+### Prompt Execution
 
+```bash
 python -m experiments.test_prompt_executor
+```
 
-Prompt evaluation:
+### Prompt Evaluation
 
+```bash
 python -m experiments.test_prompt_judge
-🧠 Design Principles
-Controlled Comparison
+```
 
-Every prompt is evaluated against the same scenarios.
+---
 
-Separate Prompt and Output Evaluation
+# 🧠 Design Principles
+
+## Controlled Comparison
+
+Every prompt is evaluated against the same evaluation scenarios.
+
+This reduces variation caused by different test inputs.
+
+---
+
+## Separate Prompt and Output Evaluation
 
 The system distinguishes between:
 
+```text
 How good was the generated answer?
                 +
 How effective was the prompt?
+```
 
-This prevents prompt quality and output quality from being treated as exactly the same thing.
+This prevents prompt quality and output quality from being treated as exactly the same measurement.
 
-Task Performance First
+---
 
-Prompt optimization is primarily focused on improving actual task performance.
+## Task Performance First
 
-Token Awareness
+The optimization process prioritizes actual task performance.
 
-More instructions do not automatically mean a better prompt.
+A prompt is not considered better simply because it contains more instructions.
 
-Token usage is tracked to understand the efficiency trade-off.
+---
 
-Modular Architecture
+## Token Awareness
 
-Each stage of the pipeline has a focused responsibility, making the system easier to test, debug, and extend.
+Token usage is tracked alongside quality metrics to understand the efficiency trade-off between prompt complexity and performance.
 
-🔐 Security
+---
+
+## Modular Architecture
+
+Each stage of the pipeline has a focused responsibility.
+
+```text
+Task Analysis
+      │
+      ▼
+Candidate Generation
+      │
+      ▼
+Scenario Generation
+      │
+      ▼
+Prompt Execution
+      │
+      ▼
+LLM Evaluation
+      │
+      ▼
+Metric Aggregation
+      │
+      ▼
+Best Prompt Selection
+```
+
+This makes the system easier to test, debug, and extend.
+
+---
+
+# 🔐 Security
 
 API credentials should never be committed to the repository.
 
 Use:
 
+```text
 .env
+```
 
 for local API configuration.
 
-The repository's .gitignore excludes:
+The repository's `.gitignore` excludes:
 
+```text
 .env
 __pycache__/
 *.pyc
 .venv/
 venv/
 .vscode/
-⚠️ Current Scope
+```
 
-This project currently focuses specifically on LLM prompt optimization and evaluation.
+---
 
-The current implementation does not include:
+# ⚠️ Current Scope
 
-❌ Retrieval-Augmented Generation (RAG)
-❌ Vector databases
-❌ Embeddings
-❌ Agentic workflows
-❌ Multi-agent systems
-❌ Persistent experiment databases
-❌ FastAPI deployment
-❌ Docker deployment
+This project currently focuses specifically on **LLM prompt optimization and evaluation**.
+
+The current implementation does **not** include:
+
+- ❌ Retrieval-Augmented Generation (RAG)
+- ❌ Vector databases
+- ❌ Embeddings
+- ❌ Agentic workflows
+- ❌ Multi-agent systems
+- ❌ Persistent experiment databases
+- ❌ FastAPI deployment
+- ❌ Docker deployment
 
 These technologies are intentionally outside the current implementation scope.
 
-🔮 Potential Future Improvements
+---
+
+# 🔮 Potential Future Improvements
 
 Possible future extensions include:
 
-📊 Persistent experiment tracking
-🌐 Web-based interface
-⚡ FastAPI backend
-📚 Experiment history and comparison
-🧪 Larger evaluation suites
-👤 Human feedback integration
-📈 Statistical comparison across repeated runs
-💰 Cost-aware prompt optimization
-🤖 Model-to-model evaluation
-☁️ Production deployment
-🎯 Why This Project?
+- 📊 Persistent experiment tracking
+- 🌐 Web-based interface
+- ⚡ FastAPI backend
+- 📚 Experiment history and comparison
+- 🧪 Larger evaluation suites
+- 👤 Human feedback integration
+- 📈 Statistical comparison across repeated runs
+- 💰 Cost-aware prompt optimization
+- 🤖 Model-to-model evaluation
+- ☁️ Production deployment
+
+---
+
+# 🎯 Why This Project?
 
 Prompt engineering is often approached through trial and error.
 
 This project explores a more systematic approach:
 
-Prompt Engineering
-       │
-       ▼
-Generate Candidates
-       │
-       ▼
-Create Test Scenarios
-       │
-       ▼
-Controlled Execution
-       │
-       ▼
-Evaluate Outputs
-       │
-       ├───────────────┐
-       ▼               ▼
-Output Quality   Prompt Effectiveness
-       │               │
-       └───────┬───────┘
-               ▼
-         Token Analysis
-               │
-               ▼
-        Select Best Prompt
+```text
+                 Prompt Engineering
+                         │
+                         ▼
+                Generate Candidates
+                         │
+                         ▼
+                 Create Scenarios
+                         │
+                         ▼
+                Controlled Execution
+                         │
+                         ▼
+                  Evaluate Outputs
+                    /           \
+                   ▼             ▼
+          Output Quality   Prompt Effectiveness
+                   \             /
+                    ▼           ▼
+                    Metric Aggregation
+                         │
+                         ▼
+                   Token Analysis
+                         │
+                         ▼
+                  Select Best Prompt
+```
 
-The goal is to make prompt optimization measurable, repeatable, and engineering-driven rather than relying entirely on manual judgment.
+The goal is to make prompt optimization:
 
-📌 Key Takeaway
+- **Measurable**
+- **Repeatable**
+- **Comparable**
+- **Engineering-driven**
+
+rather than relying entirely on manual judgment.
+
+---
+
+# 📌 Key Takeaway
 
 This project demonstrates practical experience with:
 
-Generative AI
-LLM API integration
-Prompt engineering
-LLM evaluation
-LLM-as-a-Judge
-Structured model outputs
-Scenario-based testing
-Quantitative comparison
-Token usage analysis
-Modular Python architecture
+- Generative AI
+- LLM API integration
+- Prompt engineering
+- Prompt optimization
+- LLM evaluation
+- LLM-as-a-Judge
+- Structured model outputs
+- Scenario-based testing
+- Controlled experimentation
+- Quantitative comparison
+- Token usage analysis
+- Modular Python architecture
+
+---
+
+<div align="center">
+
+### 🧠 Prompt Engineering → Evaluation → Optimization
+
+**Turning prompt experimentation into a measurable engineering workflow.**
+
+</div>
